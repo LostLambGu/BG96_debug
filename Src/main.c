@@ -77,7 +77,8 @@ UART_HandleTypeDef huart2;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+    uint32_t systickRec = 0;
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE END 1 */
   
 
@@ -115,6 +116,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
+//     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+//     GPIO_InitStruct.Pin = GPIO_PIN_9;
+//   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//   GPIO_InitStruct.Pull = GPIO_NOPULL;
+//   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   MX_USART1_UART_Init();
   #ifdef BLUE_TOOTH_USART2_SUPPORT
   MX_USART2_UART_Init();
@@ -133,29 +142,48 @@ int main(void)
   SoftwareTimerStart(&SleepModeDbgTimer);
   #endif
   /* USER CODE END 2 */
-
+    systickRec = HAL_GetTick();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  #define BASE_TIME 10
   while (1)
   {
-    /* USER CODE END WHILE */
-	// Software Time Check
-	SoftwareCheckTimerStatus();
-	// Command Process
-	CommandDetection();
-	// Accelerometer
-	Lis3dhIntProcess();
-	// I2C Int process
-	I2cIntIrqProcess();
-	// Check timer
-	if(IsTimer3TimeroutFlag == TRUE)
-	{
-		IsTimer3TimeroutFlag = FALSE;
-		HAL_TIM_Base_Stop_IT(&htim3);
-		// Print Out
-		Sprintf(URT_NRCMD,"\r\n[MAIN] Time3 timout");
-	}
-    /* USER CODE BEGIN 3 */
+      if ((HAL_GetTick() - systickRec) < (BASE_TIME * 1000))
+      {
+        //   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+      }
+    //   else if ((HAL_GetTick() - systickRec) < ((BASE_TIME) * 1000))
+    //   {
+    //       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+    //   }
+      else //if ((HAL_GetTick() - systickRec) < ((BASE_TIME + 1) * 1000))
+      {
+        //   HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
+        //   MX_USART1_UART_Init();
+          HAL_Delay(10);
+          HAL_UART_Transmit(&huart1, "hig\r", 4, 1000);
+          HAL_Delay(1000);
+      }
+    // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+    // HAL_Delay(2000);
+    // /* USER CODE END WHILE */
+	// // Software Time Check
+	// SoftwareCheckTimerStatus();
+	// // Command Process
+	// CommandDetection();
+	// // Accelerometer
+	// Lis3dhIntProcess();
+	// // I2C Int process
+	// I2cIntIrqProcess();
+	// // Check timer
+	// if(IsTimer3TimeroutFlag == TRUE)
+	// {
+	// 	IsTimer3TimeroutFlag = FALSE;
+	// 	HAL_TIM_Base_Stop_IT(&htim3);
+	// 	// Print Out
+	// 	Sprintf(URT_NRCMD,"\r\n[MAIN] Time3 timout");
+	// }
+    // /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }

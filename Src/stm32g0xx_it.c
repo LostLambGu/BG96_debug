@@ -260,9 +260,13 @@ void USART1_IRQHandler(void)
   if(__HAL_UART_GET_IT(huart, UART_IT_RXNE) != RESET)
   { 
 	/* Read one byte from the receive data register and send it back */
-	Uart1RxBuffer[Uart1RxCount] = (u8)(huart->Instance->RDR & (u8)huart->Mask);
-	if(Uart1RxCount < (UART1_RX_BUFFER_SIZE -2))
-		Uart1RxCount++;
+	// Uart1RxBuffer[Uart1RxCount] = (u8)(huart->Instance->RDR & (u8)huart->Mask);
+	// if(Uart1RxCount < (UART1_RX_BUFFER_SIZE -2))
+	// 	Uart1RxCount++;
+    Uart1RxBuffer[0] = (u8)(huart->Instance->RDR & (u8)huart->Mask);
+    // huart->Instance->TDR = Uart1RxBuffer[0];
+    // while ((__HAL_UART_GET_FLAG(huart, UART_FLAG_TXE) ? SET : RESET) == RESET);
+
 	// Check ymodem protocol status
 	SoftwareTimerReset(&UART1ReceiveTimer,UART1ReceiveTimerCallback,UART1_RECEIVE_TIMEOUT);
 	SoftwareTimerStart(&UART1ReceiveTimer);
