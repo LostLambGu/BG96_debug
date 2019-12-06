@@ -173,7 +173,7 @@ int main(void)
             }
 
             HAL_Delay(50);
-            HAL_UART_Transmit(&huart1, Uart1RxBuffer + i, Uart1RxCount - i, 5000);
+            UART_Transmit_Data(&huart1, Uart1RxBuffer + i, Uart1RxCount - i, 5000);
             Uart1RxCount = 0;
         }
       }
