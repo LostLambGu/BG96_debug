@@ -94,74 +94,48 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-  #if 0
-  // Delay 8 secs
-  HAL_Delay(5*1000);
-  // Close GPIO clock
-  __HAL_RCC_GPIOB_CLK_DISABLE();
-  __HAL_RCC_GPIOC_CLK_DISABLE();
-  __HAL_RCC_GPIOA_CLK_DISABLE();
-  // Loop
-  while(1)
-  {
-	  /* enter stop mode */
-	  HAL_SuspendTick();
-	  //HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFI);
-	  HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
-	  HAL_ResumeTick();
-  }
-  #endif
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
 
-//     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-//     GPIO_InitStruct.Pin = GPIO_PIN_9;
-//   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//   GPIO_InitStruct.Pull = GPIO_NOPULL;
-//   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   MX_USART1_UART_Init();
-  #ifdef BLUE_TOOTH_USART2_SUPPORT
-  MX_USART2_UART_Init();
-  #endif
-  MX_DMA_Init();
-  MX_ADC1_Init();
-  MX_I2C2_Init();
-  MX_TIM3_Init();
+
+  HAL_Delay(50);
+  UART_Interrupt_DeInit(&huart1);
+  HAL_UART_DeInit(&huart1);
+  HAL_Delay(50);
+
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   SystemInitialization();
-  // Debug
-  #if ((defined (STOP_MODE_CURRENT_DEBUG)) || (defined (WAIT_MODE_CURRENT_DEBUG)))
-  // Reset Check Sys Stat Timer
-  SoftwareTimerReset(&SleepModeDbgTimer,SleepModeDbgTimerCallback,SLEEP_MODE_DBG_TIMEOUT);
-  SoftwareTimerStart(&SleepModeDbgTimer);
-  #endif
   /* USER CODE END 2 */
-    systickRec = HAL_GetTick();
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  #define BASE_TIME 10
+  #define BASE_TIME_S 15
+  systickRec = HAL_GetTick();
   while (1)
   {
-    //   if ((HAL_GetTick() - systickRec) < (BASE_TIME * 1000))
-    //   {
-        //   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-    //   }
-    //   else if ((HAL_GetTick() - systickRec) < ((BASE_TIME) * 1000))
-    //   {
-    //       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
-    //   }
-    //   else if ((HAL_GetTick() - systickRec) < ((BASE_TIME + 1) * 1000))
+      if ((HAL_GetTick() - systickRec) < (BASE_TIME_S * 1000))
       {
-        //   HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
-        //   MX_USART1_UART_Init();
-        
+          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+      }
+      else if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S + 2) * 1000))
+      {
+          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+          HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
+          MX_USART1_UART_Init();
+          HAL_Delay(2500);
+      }
+      else //if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S + 3) * 1000))
+      {
         if ((Uart1RxCount > 0) && (Uart1RxBuffer[Uart1RxCount - 1] == 0x0D))
         {
             for (i = 0; i < Uart1RxCount; i++)

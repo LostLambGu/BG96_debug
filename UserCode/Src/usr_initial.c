@@ -52,12 +52,12 @@ void SystemInitialization(void)
 	
 	// Mems init
 	//Lis3dhInitialize();
-	Lis3dhCheckWhoAmI();
+	// Lis3dhCheckWhoAmI();
 
-	#ifdef NUCLEO_G031K8_BOARD_DEBUG
-	// GREEN LED ON
-	HAL_GPIO_WritePin(PC6_BUZZER_GPIO_Port, PC6_BUZZER_Pin, GPIO_PIN_RESET);
-	#endif
+	// #ifdef NUCLEO_G031K8_BOARD_DEBUG
+	// // GREEN LED ON
+	// HAL_GPIO_WritePin(PC6_BUZZER_GPIO_Port, PC6_BUZZER_Pin, GPIO_PIN_RESET);
+	// #endif
 }
 
 void CheckSysStatusTimerCallback(u8 Status)
