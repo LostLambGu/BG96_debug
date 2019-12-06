@@ -79,6 +79,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
     uint32_t systickRec = 0;
     GPIO_InitTypeDef GPIO_InitStruct = {0};
+    uint16_t i = 0;
   /* USER CODE END 1 */
   
 
@@ -148,21 +149,33 @@ int main(void)
   #define BASE_TIME 10
   while (1)
   {
-      if ((HAL_GetTick() - systickRec) < (BASE_TIME * 1000))
-      {
+    //   if ((HAL_GetTick() - systickRec) < (BASE_TIME * 1000))
+    //   {
         //   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-      }
+    //   }
     //   else if ((HAL_GetTick() - systickRec) < ((BASE_TIME) * 1000))
     //   {
     //       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
     //   }
-      else //if ((HAL_GetTick() - systickRec) < ((BASE_TIME + 1) * 1000))
+    //   else if ((HAL_GetTick() - systickRec) < ((BASE_TIME + 1) * 1000))
       {
         //   HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
         //   MX_USART1_UART_Init();
-          HAL_Delay(10);
-          HAL_UART_Transmit(&huart1, "hig\r", 4, 1000);
-          HAL_Delay(1000);
+        
+        if ((Uart1RxCount > 0) && (Uart1RxBuffer[Uart1RxCount - 1] == 0x0D))
+        {
+            for (i = 0; i < Uart1RxCount; i++)
+            {
+                if (Uart1RxBuffer[i] != 0)
+                {
+                    break;
+                }
+            }
+
+            HAL_Delay(50);
+            HAL_UART_Transmit(&huart1, Uart1RxBuffer + i, Uart1RxCount - i, 5000);
+            Uart1RxCount = 0;
+        }
       }
     // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
     // HAL_Delay(2000);
