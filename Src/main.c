@@ -104,6 +104,26 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SystemInitialization();
 
+#if 0
+  HAL_Delay(50);
+  UART_Interrupt_DeInit(&huart1);
+  HAL_UART_DeInit(&huart1);
+  HAL_Delay(50);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+
+  while (1)
+  {
+      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+      HAL_Delay(500);
+  }
+#endif
+
   HAL_Delay(5000);
   /* USER CODE END 2 */
 
@@ -149,9 +169,10 @@ int main(void)
       else if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S * 2 + 2) * 1000))
       {
           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+          HAL_Delay(2000);
           HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
           MX_USART1_UART_Init();
-          HAL_Delay(2500);
+          HAL_Delay(500);
       }
       else //if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S + 3) * 1000))
       {
