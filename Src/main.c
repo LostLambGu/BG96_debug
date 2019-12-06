@@ -100,21 +100,11 @@ int main(void)
   MX_GPIO_Init();
 
   MX_USART1_UART_Init();
-
-  HAL_Delay(50);
-  UART_Interrupt_DeInit(&huart1);
-  HAL_UART_DeInit(&huart1);
-  HAL_Delay(50);
-
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   //MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   SystemInitialization();
+
+  HAL_Delay(5000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,9 +115,38 @@ int main(void)
   {
       if ((HAL_GetTick() - systickRec) < (BASE_TIME_S * 1000))
       {
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+          if ((Uart1RxCount > 0) && (Uart1RxBuffer[Uart1RxCount - 1] == 0x0D))
+          {
+              for (i = 0; i < Uart1RxCount; i++)
+              {
+                  if (Uart1RxBuffer[i] != 0)
+                  {
+                      break;
+                  }
+              }
+
+              HAL_Delay(50);
+              UART_Transmit_Data(&huart1, Uart1RxBuffer + i, Uart1RxCount - i, 5000);
+              Uart1RxCount = 0;
+          }
       }
-      else if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S + 2) * 1000))
+      else if ((HAL_GetTick() - systickRec) < (BASE_TIME_S * 2 * 1000))
+      {
+          HAL_Delay(50);
+          UART_Interrupt_DeInit(&huart1);
+          HAL_UART_DeInit(&huart1);
+          HAL_Delay(50);
+
+          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+          GPIO_InitStruct.Pin = GPIO_PIN_9;
+          GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+          GPIO_InitStruct.Pull = GPIO_NOPULL;
+          GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+          HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+          HAL_Delay(BASE_TIME_S * 1000);
+      }
+      else if ((HAL_GetTick() - systickRec) < ((BASE_TIME_S * 2 + 2) * 1000))
       {
           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
           HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
